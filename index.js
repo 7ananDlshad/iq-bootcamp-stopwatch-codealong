@@ -5,112 +5,113 @@ const lapButton = document.getElementById("lap");
 const timer = document.getElementById("timer");
 const timelapsList = document.getElementById("timelaps-list");
 
-let milliseconds = 0;
-let seconds = 0;
-let minutes = 0;
-let hours = 0;
+let timeStarted = null;
+let timeStopped = null;
+let pausedDuration = 0;
+let intervalId = null;
+const timeLaps = [];
 
-let interval;
-let timeLaps = [];
+function padZeros(num, length = 2) {
+  const padded = num.toString().split("");
+  while (padded.length < length) {
+    padded.unshift(0);
+  }
+  return padded.join("");
+}
 
-function formattingTime(hours, minutes, seconds, milliseconds) {
+function formatTime(time) {
+  const h = time.getUTCHours();
+  const m = time.getUTCMinutes();
+  const s = time.getUTCSeconds();
+  const ms = time.getUTCMilliseconds();
 
-    if (hours < 10) {
-        hours = '0' + hours;
-    }
+  let formatted = `${padZeros(h)} : ${padZeros(m)} : ${padZeros(s)}`;
 
-    if (minutes < 10) {
-        minutes = '0' + minutes;
-    }
+  formatted += `<span class="faint">.${padZeros(ms, 3)}</span>`;
 
-    if (seconds < 10) {
-        seconds = '0' + seconds;
-    }
+  return formatted;
+}
 
-    let millisecondsString = milliseconds.toString();
-    while (millisecondsString.length < 3) {
-        millisecondsString = '0' + millisecondsString;
-    }
-
-    return hours + ' : ' + minutes + ' : ' + seconds + '.' + millisecondsString;
+function getTimeElapsed(time = Date.now()) {
+  const timeElapsed = new Date(time - timeStarted - pausedDuration);
+  return timeElapsed;
 }
 
 function timeIt() {
-    milliseconds++;
-    if (milliseconds > 999) {
-        seconds++;
-        milliseconds = 0;
-    }
-    if (seconds > 59) {
-        minutes++;
-        seconds = 0;
-    }
-    if (minutes > 59) {
-        hours++;
-        minutes = 0;
-    }
-    timer.innerText = formattingTime(hours, minutes, seconds, milliseconds);
+  const timeLapped = getTimeElapsed();
+  timer.innerHTML = formatTime(timeLapped);
+}
+
+function resetInterval() {
+  clearInterval(intervalId);
+  intervalId = null;
 }
 
 function startStopWatch() {
-    if (interval == null) {
-        interval = setInterval(timeIt, 1);
-    }
+  if (timeStarted === null) {
+    timeStarted = Date.now();
+  }
+
+  if (timeStopped !== null) {
+    pausedDuration += Date.now() - timeStopped;
+  }
+
+  if (intervalId == null) {
+    intervalId = setInterval(timeIt, 10);
+  }
 }
 
 function stopStopWatch() {
-    clearInterval(interval);
-    interval = null;
+  if (timeStarted) {
+    timeStopped = Date.now();
+    resetInterval();
+  }
 }
 
 function resetStopWatch() {
-    clearInterval(interval);
-    interval = null;
-    milliseconds = 0;
-    seconds = 0;
-    minutes = 0;
-    hours = 0;
-    timer.innerText = "00 : 00 : 00.000";
-    timeLaps = [];
-    timelapsList.innerHTML = "";
+  resetInterval();
+
+  pausedDuration = 0;
+  timeStarted = null;
+  timeStopped = null;
+
+  timer.innerHTML = formatTime(new Date(0));
+
+  timeLaps.splice(0);
+  displayLaps(timeLaps);
 }
 
-function lapStopWatch() {
-    let currentDate = new Date();
-    let timelapped = formattingTime(currentDate.getHours(), currentDate.getMinutes(), currentDate.getSeconds(), currentDate.getMilliseconds());
-    timelapped = timelapped.substring(0, 7);
+function recordLap() {
+  const currentTime = new Date();
+  let lap = {
+    timeLapped: timer.innerHTML,
+    capturedOn: currentTime,
+  };
+  timeLaps.push(lap);
 
-    let lap = {
-        capturedTime: timer.innerText,
-        time: timelapped
-    };
-    timeLaps.push(lap);
-
-    displayLaps(timeLaps);
+  displayLaps(timeLaps);
 }
 
 function displayLaps(arr) {
-    timelapsList.innerHTML = "";
+  timelapsList.innerHTML = "";
 
-    for (let i = 0; i < arr.length; i++) {
-        const li = document.createElement('li');
-        const lapDiv = document.createElement('div');
-        const capturedTimeDiv = document.createElement('div');
-        const capturedTimeTextNode = document.createTextNode(arr[i].capturedTime);
-        const timeLappedDiv = document.createElement('div');
-        const timeLappedTextNode = document.createTextNode(arr[i].time);
+  for (let i = 0; i < arr.length; i++) {
+    const li = document.createElement("li");
 
-        capturedTimeDiv.appendChild(capturedTimeTextNode);
-        timeLappedDiv.appendChild(timeLappedTextNode);
-        timeLappedDiv.setAttribute('class', 'timeLappedDiv')
-        lapDiv.appendChild(capturedTimeDiv);
-        lapDiv.appendChild(timeLappedDiv);
-        li.appendChild(lapDiv);
-        timelapsList.appendChild(li);
-    }
+    const capturedTimeDiv = document.createElement("div");
+    capturedTimeDiv.innerHTML = arr[i].timeLapped;
+
+    const timeLappedDiv = document.createElement("div");
+    timeLappedDiv.innerText = arr[i].capturedOn.toLocaleTimeString();
+
+    timeLappedDiv.setAttribute("class", "timeCapturedDiv");
+    li.appendChild(capturedTimeDiv);
+    li.appendChild(timeLappedDiv);
+    timelapsList.appendChild(li);
+  }
 }
 
-startButton.addEventListener('click', startStopWatch);
-stopButton.addEventListener('click', stopStopWatch);
-resetButton.addEventListener('click', resetStopWatch);
-lapButton.addEventListener('click', lapStopWatch);
+startButton.addEventListener("click", startStopWatch);
+stopButton.addEventListener("click", stopStopWatch);
+resetButton.addEventListener("click", resetStopWatch);
+lapButton.addEventListener("click", recordLap);

@@ -5,13 +5,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stopwatch</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        main {
+            width: 600px;
+            margin: 50px auto;
+            text-align: center;
+        }
+    </style>
+    <link rel="stylesheet" href="sstyle.css">
 </head>
 
 <body>
     <main>
         <div class="stop-watch-display">
-            <h1 id="timer">00 : 00 : 00.000</h1>
+            <h1 id="timer">00 : 00 : 00<span class="faint">.000</span></h1>
         </div>
         <div class="stop-watch-controllers">
             <button id="start">Start</button>
