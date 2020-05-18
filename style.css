@@ -1,50 +1,57 @@
 * {
-	box-sizing: border-box;
-	margin: 0px;
-    padding: 0px;
-    text-align: center;
+  box-sizing: border-box;
+  margin: 0px;
+  padding: 0px;
+  text-align: center;
 }
 
-body{
-    font-family: "Lato";
+body {
+  font-family: "Lato";
 }
 
 main {
-	width: 900px;
-	margin: 0 auto;
-	margin-top: 200px;
+  width: 900px;
+  margin: 0 auto;
+  margin-top: 200px;
 }
 
-.stop-watch-controllers{
-    margin-top: 60px;
+.stop-watch-controllers {
+  margin-top: 60px;
 }
 
 #timer {
-	font-size: 100px;
-	font-weight: 300;
+  font-size: 100px;
+  font-weight: 300;
 }
 
 button {
-	padding: 10px 20px;
+  padding: 10px 20px;
 }
 
 ul#timelaps-list {
-	list-style-type: none;
-	margin: 60px 0px;
+  list-style-type: none;
+  margin: 60px 0px;
 }
 
 ul#timelaps-list li {
-    font-size: 1.5rem;
-    padding: 10px 30px;
-    width: 500px;
-	margin: 10px auto;
-	border-radius: 4px;
-	background-color: #efeeee;
-	color: #27ae60;
+  font-size: 1.5rem;
+  padding: 10px 30px;
+  width: 500px;
+  margin: 10px auto;
+  border-radius: 4px;
+  color: #27ae60;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.timeLappedDiv{
-    font-size: smaller;
-    font-style: italic;
-    color: #7f8c8d;
+.timeCapturedDiv {
+  font-size: 0.6em;
+  font-style: italic;
+  color: #7f8c8d;
+}
+
+.faint {
+  color: #e3e3e3;
+  font-size: smaller;
 }
